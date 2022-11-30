@@ -1,0 +1,517 @@
+---
+title: 'Informe Final: Estudio de Mercados'
+author: 'Seminario de Grado '
+date: "23/12/2021"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+> Asignatura:		 Seminario de Grado 
+
+> Sección: 		C1/V Curicó IC 
+
+> Nombre del docente:  	Osvaldo Cubillos Sandoval 
+
+> Nombre de los integrantes del grupo: 
+
+-	María Gloria Bravo Urbina 
+
+-	Julio Céspedes González 
+
+-	Estefanía Guajardo Rojas 
+
+-	Nicolás Retamales Rojas  
+
+
+
+## Descripcion de los datos
+
+- ¿Conoce usted alguna Tetería?	P1
+
+- Si se instalara una Tetería en la cuidad de Curicó ¿usted asistiría? 	P2
+
+ - ¿Practica  o practicaría usted algún videojuegos?	P3
+ 
+- ¿Con qué frecuencia juega videojuegos?	P4
+
+- ¿Cuenta con un equipo de videojuegos?	P5
+
+- ¿Qué equipo es de su preferencia? Puede elegir más de una opción 	P6
+
+- ¿Seria una opción para usted ir a un lugar especializado en entretenimiento de videojuegos, como una tetería para gamers? 	P7
+
+- ¿Qué tipo de videojuegos le gustaría jugar? seleccione todos los que apliquen	P8
+ 
+- ¿Cuántas veces a la semana asistiría a visitar el local?	P9
+ 
+- ¿En qué horario visitaría las instalaciones ?	P10
+ 
+- ¿Le gustaría que en la carta  existirán otros productos como sándwich, bebidas, snack? P11
+
+- ¿Cuánto estaría dispuesto a pagar por 1 té de 200 ml. de calidad premium?	P12
+
+- ¿Cuánto estaría dispuesto a pagar por 1 hora de entretenimiento en un lugar especializado en videojuegos?	P13
+
+- ¿Qué atributos valoraría en un lugar como este? Selecciones todas sus preferencias	P14
+
+- ¿En qué lugar de la ciudad de Curicó le gustaría que estuviera ubicado la tetería para Gamers?	P15
+
+- Dirección de correo electrónico	P16
+
+primero se cargan los datos
+
+```{r message=FALSE,warning=FALSE}
+
+library(dplyr)
+
+df <- read.csv("C:/Users/USUARIO/OneDrive/COMPARTIR LENOVO/Programacion R/TareaR/Formulario Respuestas Seminario de Grado.csv")
+
+df[df == ""] <- NA
+df[df == 0] <- NA
+
+length(df) 
+
+names(df)<- c("Marca.temporal","Puntuacion","Sexo","Edad",
+       "situacion.laboral","rangosalarial","lugar.residencia",
+  paste0("P",1:16)
+  )
+df<-df[,1:(length(df)-1) ]
+head(df)
+
+```
+
+Tambien se cambien los nombres de las variables a nombres mucho mas amigable para el manejo del R.
+
+el analisis descriptivo se divide en variables demograficas y variables del estudio.
+## Analisis descriptivo
+
+>Variables demograficas
+
+```{r message=FALSE,warning=FALSE}
+
+summary(df[,2:7])
+
+```
+Ahora se observa su probabilidad
+
+```{r message=FALSE,warning=FALSE}
+
+aux<-apply(df[2:7], 2,table )
+lapply(aux,prop.table )
+
+```
+
+
+> Entre los datos demograficos que mayor impacta se tiene:
+
+Que encuestados Masculino representa el 64,24% de los datos, mientras que femenino es 39,94% y otros el resto de porcentaje.
+
+Ahora el rango salarial entre 501.000 y 700.000 representa el 30,31%, mientras que entre 701.000 y 900.000 es del 41,45%.
+
+siendo estos dos grupos el mayoritario en la encuesta. El lugar de residencia Curicó es el mayoriatio con el 33,68%
+
+La situacion laboral de los encuestados es para trabajadores tiempo completo del 69,94%
+
+
+> Preguntas de la encuesta
+
+```{r message=FALSE,warning=FALSE}
+
+summary(df[8:length(df)])
+
+```
+> Ahora en porcentaje
+
+
+```{r message=FALSE,warning=FALSE}
+
+aux2<-apply(df[8:length(df)], 2,table )
+lapply(aux2,prop.table)
+
+```
+Para la pregunta 1, ¿Conoce usted alguna Tetería?	se tiene que Si representa el 59,43%.
+
+Para la pregunta 2, Si se instalara una Tetería en la cuidad de Curicó ¿usted asistiría? se tiene que la categoria Si representa el 71,57%.
+
+
+Para la pregunta 3, ¿Practica o practicaría usted algún videojuegos? se tiene que la categoria Si representa el 72,35%.
+
+Para la pregunta 4, ¿Con qué frecuencia juega videojuegos? se tiene que la categoria Todos los dias representa el 46,96%. siendo la mayoritaria.
+
+
+En las primeras 4 preguntas se empieza a observar una clara inclinacion de aceptacion en lo factible que resultaria ir hacia adelante con el negocio.
+
+
+
+
+## Pregunta 1
+
+
+```{r message=FALSE,warning=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+tabp1<-df %>% group_by(P1) %>% summarise(n=n())
+
+ggplot(tabp1,aes(P1,n) ) +geom_bar(stat="identity")+ggtitle("P1. ¿Conoce usted alguna Tetería?")
+
+```
+
+
+## Pregunta 2
+
+
+```{r message=FALSE,warning=FALSE}
+
+tabp2<-df %>% group_by(P2) %>% summarise(n=n())
+
+ggplot(tabp2,aes(P2,n) ) +geom_bar(stat="identity")+ggtitle("P2. Si se instalara una Tetería en la cuidad de Curicó ¿usted asistiría?")
+
+```
+
+## Pregunta 3
+
+```{r message=FALSE,warning=FALSE}
+
+tabp3<-df %>% group_by(P3) %>% summarise(n=n())
+tabp3<-mutate(tabp3,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp3, aes(x=1, y=n, fill=P3)) +
+        geom_bar(stat="identity") +
+        geom_text(aes(label = paste0(round(porcentaje,2),"%")), 
+                  position = position_stack(vjust = 0.5)) + ggtitle("¿Practica  o practicaría usted algún videojuegos?")+
+        coord_polar(theta = "y") + 
+        theme_void()
+
+```
+
+
+## Pregunta 4
+
+```{r message=FALSE,warning=FALSE}
+
+tabp4<-df %>% group_by(P4) %>% summarise(n=n())
+tabp4<-mutate(tabp4,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp4,aes(P4,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P4. ¿Con qué frecuencia juega videojuegos?")
+
+```
+
+
+## Pregunta 5
+
+```{r message=FALSE,warning=FALSE}
+library()
+tabp5<-df %>% group_by(P5) %>% summarise(n=n())
+tabp5<-mutate(tabp5,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp5, aes(x=1, y=n, fill=P5)) +
+        geom_bar(stat="identity") +
+        geom_text(aes(label = paste0(round(porcentaje,2),"%")),
+                  position = position_stack(vjust = 0.5)) +
+        coord_polar(theta = "y") +
+        theme_void()+ggtitle("P5. ¿Cuenta con un equipo de videojuegos?")
+
+```
+
+## Pregunta 6
+
+```{r message=FALSE,warning=FALSE}
+
+df<-select(df,-Puntuacion)
+
+ library(tidyr)
+ library(stringr)
+df$P6 <-gsub("ii,","ii.",df$P6)
+
+df<-separate(data =  df,
+                   col  =  P6,
+                   into =  c("P6_1","P6_2","P6_3"),
+                   sep  =  ",",
+                   convert = TRUE)
+
+
+df$P6_1<-str_trim(df$P6_1)
+df$P6_1<-str_squish(df$P6_1)
+df$P6_2<-str_trim(df$P6_2)
+df$P6_2<-str_squish(df$P6_2)
+df$P6_3<-str_trim(df$P6_3)
+df$P6_3<-str_squish(df$P6_3)
+
+head(df)
+
+ library(expss)
+
+  names(df)
+
+  #P<-calc_cro_cpct(df, mrset_f(P6_))
+  P<-calc_cro_cpct(df, mrset_p("P6_"))
+  #P<-calc_cro_cpct(df, mrset(P6_1 %to% P6_3))
+  #P
+  #P=P[1:(length(P$row_labels)-1),]
+
+  ggplot(P,aes(row_labels,`#Total` ) ) +geom_bar(stat="identity")+ggtitle("P6. ¿Qué equipo es de su preferencia? Puede elegir más de una opción ")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ print(P)
+```
+
+
+## Pregunta 7
+
+```{r message=FALSE,warning=FALSE}
+
+tabp7<-df %>% group_by(P7) %>% summarise(n=n())
+tabp7<-mutate(tabp7,porcentaje=(n/sum(n))*100)
+
+ggplot(tabp7, aes(x=1, y=n, fill=P7)) +
+        geom_bar(stat="identity") +
+        geom_text(aes(label = paste0(round(porcentaje,2),"%")), 
+                  position = position_stack(vjust = 0.5)) +
+        coord_polar(theta = "y") + 
+        theme_void()+ggtitle("P7. ¿Seria una opción para usted ir a un lugar especializado en entretenimiento de videojuegos, como una tetería para gamers?")
+
+
+```
+
+
+
+```{r message=FALSE,warning=FALSE}
+
+library(expss)
+df<-separate(data =  df,
+                   col  =  P8,
+                   into =  c("P8_1","P8_2","P8_3"),
+                   sep  =  ",",
+                   convert = TRUE)
+
+
+df$P8_1<-str_trim(df$P8_1)
+df$P8_1<-str_squish(df$P8_1)
+df$P8_2<-str_trim(df$P8_2)
+df$P8_2<-str_squish(df$P8_2)
+df$P8_3<-str_trim(df$P8_3)
+df$P8_3<-str_squish(df$P8_3)
+
+head(df,3)
+
+  P.8<-calc_cro_cpct(df, mrset(P8_1 %to% P8_3))
+  #P.8<-calc_cro_cpct(df, mrset_f(P8_))
+  #calc_cro_cpct(df, mrset_p("P8_"))
+  
+  print(P.8)
+  #P.8=P[1:(length(P.8$row_labels)-1),]
+
+
+  ggplot(P.8,aes(row_labels,`#Total` ) ) +geom_bar(stat="identity")+ggtitle("P8. ")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+```
+
+
+## Pregunta 9
+
+```{r message=FALSE,warning=FALSE}
+
+tabp9<-df %>% group_by(P9) %>% summarise(n=n())
+tabp9<-mutate(tabp9,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp9,aes(P9,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P9. ")
+
+```
+
+## Pregunta 10
+
+```{r message=FALSE,warning=FALSE}
+
+tabp10<-df %>% group_by(P10) %>% summarise(n=n())
+tabp10<-mutate(tabp10,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp10,aes(P10,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P10. ")
+
+```
+
+## Pregunta 11
+
+```{r message=FALSE,warning=FALSE}
+
+#%>% filter( is.na(P11)!=TRUE )
+
+tabp11<-df  %>% group_by(P11) %>% summarise(n=n())
+tabp11<-mutate(tabp11,porcentaje=(n/sum(n))*100)
+
+ggplot(tabp11, aes(x=1, y=n, fill=P11)) +
+        geom_bar(stat="identity") +
+        geom_text(aes(label = paste0(round(porcentaje,2),"%")), 
+                  position = position_stack(vjust = 0.5)) +
+        coord_polar(theta = "y") + 
+        theme_void()+ggtitle("P11.¿Le gustaría que en la carta  existirán otros productos como sándwich, bebidas, snack?")
+
+```
+
+
+## Pregunta 12
+
+```{r message=FALSE,warning=FALSE}
+
+tabp12<-df %>% group_by(P12) %>% summarise(n=n())
+tabp12<-mutate(tabp12,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp12,aes(P12,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P12. ¿Cuánto estaría dispuesto a pagar por 1 té de 200 ml. de calidad premium?")
+
+```
+
+## Pregunta 13
+
+```{r message=FALSE,warning=FALSE}
+
+tabp13<-df %>% group_by(P13) %>% summarise(n=n())
+tabp13<-mutate(tabp13,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp13,aes(P13,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P13. ¿Cuánto estaría dispuesto a pagar por 1 hora de entretenimiento en un lugar especializado en videojuegos?")
+
+```
+
+```{r message=FALSE,warning=FALSE}
+
+names(df)
+library(expss)
+df<-separate(data =  df,
+                   col  =  P14,
+                   into =  c("P14_1","P14_2","P14_3"),
+                   sep  =  ",",
+                   convert = TRUE)
+
+
+df$P14_1<-str_trim(df$P14_1)
+df$P14_1<-str_squish(df$P14_1)
+df$P14_2<-str_trim(df$P14_2)
+df$P14_2<-str_squish(df$P14_2)
+df$P14_3<-str_trim(df$P14_3)
+df$P14_3<-str_squish(df$P14_3)
+
+
+head(df,3)
+ 
+   #P.14<-calc_cro_cpct(df, mrset(df$P14_1 %to% df$P14_3))
+   
+#P.14<-calc_cro_cpct(df, mrset_t("P14_{1:3}"))
+P.14<-calc_cro_cpct(df, mrset_f(P14_))
+   
+#P.14=P[1:(length(P.14$row_labels)-1),]
+print(P.14) 
+ 
+   ggplot(P.14,aes(row_labels,`#Total` ) ) +geom_bar(stat="identity")+ggtitle("P14.¿Qué atributos valoraría en un lugar como este? Selecciones todas sus preferencias")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+```
+
+
+## Pregunta 15
+
+```{r message=FALSE,warning=FALSE}
+
+tabp15<-df %>% group_by(P15) %>% summarise(n=n())
+tabp15<-mutate(tabp15,porcentaje=(n/sum(n))*100 )
+
+ggplot(tabp15,aes(P15,n) ) +geom_bar(stat="identity")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ggtitle("P15.¿En qué lugar de la ciudad de Curicó le gustaría que estuviera ubicado la tetería para Gamers?")
+
+```
+
+
+## Análisis bivariado
+
+>P4 vs sexo
+
+```{r message=FALSE,warning=FALSE}
+
+
+#$df2<-df %>% filter() %>%
+str(df)
+table(df$Edad)
+
+df$Sexo<- factor(df$Sexo,levels = c("Femenino","Masculino","Otro"),labels =c("Femenino","Masculino","Otro")  )
+
+barplot(table(df$Sexo, df$P4), col=c("pink","blue","red"),legend.text=TRUE,
+        main="P4 vs sexo") 
+
+
+```
+
+
+> P4 vs Salario
+
+```{r message=FALSE,warning=FALSE}
+
+levels(df$rangosalarial)
+
+table(df$rangosalarial)
+
+df$rangosalarial<- factor(df$rangosalarial,levels = c("Entre $ 901.000 y más","Entre $501.000 y $700.000","Entre $701.000 y $900.000" ,"Menos de $500.000","No tengo fuente de ingresos","Sobre $900.0000"),labels =c("Entre $ 901.000 y más","Entre $501.000 y $700.000","Entre $701.000 y $900.000" ,"Menos de $500.000","No tengo fuente de ingresos","Sobre $900.0000")  )
+
+barplot(table(df$rangosalarial, df$P4), col=rainbow(6),legend.text=TRUE,
+        main="P4 vs Rango salarial", horiz = TRUE)
+
+```
+
+> P3 vs Salario
+
+```{r message=FALSE,warning=FALSE}
+
+
+barplot(table(df$rangosalarial, df$P3), col=rainbow(6),legend.text=TRUE,
+        main="P3 vs Rango salarial", horiz = TRUE)
+
+```
+
+
+Segun el grafico, salarios medios a salario medio alto son posibles clientes potenciales para la practica de video juegos.
+
+> P3 vs Sexo
+
+```{r message=FALSE,warning=FALSE}
+
+
+barplot(table(df$Sexo, df$P3), col=rainbow(3),legend.text=TRUE,
+        main="P3 vs Sexo", horiz = TRUE)
+
+```
+
+Se observa que el grupo de interes es el masculino, donde con respecto a femenino es mucho mayor el grupo de masculino.
+
+
+
+## Análisis multivariado
+
+> P1 vs rango salarial y sexo 
+
+```{r message=FALSE,warning=FALSE}
+table(df$P1,df$rangosalarial ,df$Sexo)
+
+```
+
+
+> P2 vs rango salarial y sexo
+
+```{r message=FALSE,warning=FALSE}
+table(df$P2,df$rangosalarial ,df$Sexo)
+
+```
+
+> P3 vs rango salarial y sexo
+
+```{r message=FALSE,warning=FALSE}
+table(df$P3,df$rangosalarial ,df$Sexo)
+
+```
+
+> P4 vs rango salarial y sexo
+
+```{r message=FALSE,warning=FALSE}
+table(df$P4,df$rangosalarial ,df$Sexo)
+
+```
